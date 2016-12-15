@@ -15,6 +15,7 @@ public class BuildInfo
     public string IdentityServer { get; set; }
     public string CreatedTime { get; set; }
     public bool HasError { get; set; } = false;
+    public bool IsLatestBuild { get; set; } = false;
 
     public void ReadDbSetting(string configFile)
     {

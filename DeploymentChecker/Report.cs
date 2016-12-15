@@ -15,13 +15,16 @@ public static class Report
         var idServerRelativePath = ConfigurationManager.AppSettings["IdServerSettingPath"];
         var dbSettingRelativePath = ConfigurationManager.AppSettings["DbSettingPath"];
         var builds = new List<BuildInfo>();
+        BuildInfo lastestBuild = null;
 
-        foreach(var projectFolder in Directory.GetDirectories(projectsFolder))
+        var projectFolders = Directory.GetDirectories(projectsFolder).OrderBy(Directory.GetCreationTime);
+        foreach(var projectFolder in projectFolders)
         {
             if(!Path.GetFileName(projectFolder).ToLower().Contains(projectName.ToLower()))
                 continue;
 
-            foreach (var buildFolder in Directory.GetDirectories(projectFolder).Where(x => x.ToLower().Contains(projectName.ToLower())))
+            var buildFolders = Directory.GetDirectories(projectFolder).OrderBy(Directory.GetCreationTime);
+            foreach (var buildFolder in buildFolders)
             {
                 if(!Path.GetFileName(buildFolder).ToLower().Contains(projectName.ToLower()))
                     continue;
@@ -38,7 +41,12 @@ public static class Report
                 build.ReadIdServerSetting(idServerPath);
                 build.ReadDbSetting(dbSettingPath);
                 builds.Add(build);
+
+                lastestBuild = build;
             }
+
+            if (lastestBuild != null)
+                lastestBuild.IsLatestBuild = true;
         }
 
         Generate(builds);
@@ -79,6 +87,9 @@ th {
 .error{
     color: red;
 }
+.top-divider{
+    border-top: 3pt double #ff4d4d;
+}
 </style>
 </head>
 <body>
@@ -89,6 +100,7 @@ Overview of Deployments
 
             //Titles
             writer.WriteLine("<tr>");
+            writer.WriteLine("<th></th>");
             foreach (var title in BuildInfo.GetTitles()) 
             {
                 writer.WriteLine($"<th>{title}</th>");
@@ -96,14 +108,31 @@ Overview of Deployments
             writer.WriteLine("</tr>");
 
             //Datas
-            foreach (var buildInfo in buildInfos) 
+            var previousTenant = buildInfos.Any() ? buildInfos.ToList()[0].Tenant : "";
+            foreach (var buildInfo in buildInfos)
             {
-                writer.WriteLine(buildInfo.HasError ? "<tr class=\"error\">" : "<tr>");
+                var classes = new List<string>();
+
+                if(buildInfo.Tenant != previousTenant)
+                    classes.Add("top-divider");
+
+                previousTenant = buildInfo.Tenant;
+
+                if(buildInfo.HasError)
+                    classes.Add("error");
+
+                if(classes.Any())
+                    writer.WriteLine($"<tr class=\"{string.Join(" ", classes)}\">");
+                else
+                    writer.WriteLine("<tr>");
+
+                writer.WriteLine($"<td>{(buildInfo.IsLatestBuild ? "*" : "")}</td>");
                 foreach (var data in BuildInfo.GetContents(buildInfo)) 
                 {
                     writer.WriteLine($"<td>{data}</td>");
                 }
                 writer.WriteLine("</tr>");
+
             }
 
             writer.WriteLine(@"</table>
