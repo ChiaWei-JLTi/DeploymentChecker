@@ -4,69 +4,75 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
-public class BuildInfo
+namespace DeploymentChecker.Models
 {
-    public string Tenant { get; set; }
-    public string BuildVersion { get; set; }
-    public string Server { get; set; }
-    public string Database { get; set; }
-    public string IdentityServer { get; set; }
-    public string CreatedTime { get; set; }
-    public bool HasError { get; set; } = false;
-    public bool IsLatestBuild { get; set; } = false;
-
-    public void ReadDbSetting(string configFile)
+    public class BuildInfo
     {
-        try 
+        public string Tenant { get; set; }
+        public string BuildVersion { get; set; }
+        public string Server { get; set; }
+        public string Database { get; set; }
+        public string IdentityServer { get; set; }
+        public string CreatedTime { get; set; }
+        public bool HasError { get; set; } = false;
+        public bool IsLatestBuild { get; set; } = false;
+
+        public void ReadDbSetting(string configFile)
         {
-            var doc = XDocument.Load(configFile);
-            var xmlAttr = doc.Descendants("connectionStrings")
-                             .Descendants("add")
-                             .Attributes().First(x => x.Name=="connectionString");
-            var sqlConnString = new SqlConnectionStringBuilder(xmlAttr.Value);
+            try 
+            {
+                var doc = XDocument.Load(configFile);
+                var xmlAttr = doc.Descendants("connectionStrings")
+                                 .Descendants("add")
+                                 .Attributes().First(x => x.Name=="connectionString");
+                var sqlConnString = new SqlConnectionStringBuilder(xmlAttr.Value);
 
-            Server = sqlConnString.DataSource;
-            Database = sqlConnString.InitialCatalog;
+                Server = sqlConnString.DataSource;
+                Database = sqlConnString.InitialCatalog;
+            }
+            catch
+            {
+                HasError = false;
+            }
         }
-        catch
+
+        public void ReadIdServerSetting(string configFile)
         {
-            HasError = false;
-        }
-    }
+            try 
+            {
+                var doc = XDocument.Load(configFile);
+                var xmlAttr = doc.Descendants("appSettings")
+                                .Descendants("add")
+                                .First(x => x.Attributes().Any(y => y.Name == "key" && y.Value == "authority"))
+                                .Attributes()
+                                .First(x => x.Name == "value");
 
-    public void ReadIdServerSetting(string configFile)
-    {
-        try 
+                IdentityServer = xmlAttr.Value;
+            }
+            catch
+            {
+                HasError = false;
+            }
+        }
+
+        public static List<string> GetTitles()
         {
-            var doc = XDocument.Load(configFile);
-            var xmlAttr = doc.Descendants("appSettings")
-                            .Descendants("add")
-                            .First(x => x.Attributes().Any(y => y.Name == "key" && y.Value == "authority"))
-                            .Attributes()
-                            .First(x => x.Name == "value");
-
-            IdentityServer = xmlAttr.Value;
+            return GetProperties().Select(x => x.Name).ToList();
         }
-        catch
+
+        public static List<string> GetContents(BuildInfo buildInfo)
         {
-            HasError = false;
+            return GetProperties().Select(x => (string) x.GetValue(buildInfo) ?? "").ToList();
+        }
+
+        private static IEnumerable<PropertyInfo> GetProperties()
+        {
+            return typeof(BuildInfo).GetProperties().Where(x => x.PropertyType == typeof(string));
         }
     }
 
-    public static List<string> GetTitles()
-    {
-        return GetProperties().Select(x => x.Name).ToList();
-    }
-
-    public static List<string> GetContents(BuildInfo buildInfo)
-    {
-        return GetProperties().Select(x => (string) x.GetValue(buildInfo) ?? "").ToList();
-    }
-
-    private static IEnumerable<PropertyInfo> GetProperties()
-    {
-        return typeof(BuildInfo).GetProperties().Where(x => x.PropertyType == typeof(string));
-    }
 }
+
+
 
 

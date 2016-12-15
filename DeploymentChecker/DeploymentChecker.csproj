@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CommonFunctions.cs" />
     <Compile Include="Controllers\CompanySettingsReport.cs" />
     <Compile Include="Models\CompanySettingInfo.cs" />
     <Compile Include="Models\BuildInfo.cs" />
