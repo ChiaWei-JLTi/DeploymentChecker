@@ -56,7 +56,7 @@ namespace DeploymentChecker.Controllers
 
         public static void Generate(IEnumerable<BuildInfo> buildInfos)
         {
-            var reportName = CommonFunctions.GetFileName(CommonFunctions.ReportType.DeploymentReport);
+            var reportName = CommonFunctions.GetFileName(ReportType.DeploymentReport);
             using (var writer = File.CreateText(reportName)) 
             {
                 writer.WriteLine(@"<!DOCTYPE html>
@@ -64,7 +64,7 @@ namespace DeploymentChecker.Controllers
 <head>
 <title>Report</title>
 <style>
-    table {
+table {
     border-collapse: collapse;
     max-width: 100%;
     white-space:nowrap;

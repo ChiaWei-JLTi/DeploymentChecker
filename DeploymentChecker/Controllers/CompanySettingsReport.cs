@@ -31,16 +31,18 @@ namespace DeploymentChecker.Controllers
 
         private static void Generate(IEnumerable<CompanySettingInfo> companySettings, IEnumerable<string> masterKeys)
         {
-            var reportName = CommonFunctions.GetFileName(CommonFunctions.ReportType.CompanySettingsReport);
+            var reportName = CommonFunctions.GetFileName(ReportType.CompanySettingsReport);
             using (var writer = File.CreateText(reportName))
             {
                 writer.WriteLine(@"<!DOCTYPE html>
 <html>
 <head>
-<title>Company Settings</title>
+<title>Company Settings Report</title>
+</head>
 <style>
-    table {
+table {
     border-collapse: collapse;
+    margin: 20px;
     max-width: 100%;
     white-space:nowrap;
 }
@@ -56,22 +58,59 @@ th {
     background-color: #4CAF50;
     color: white;
 }
-.error{
-    color: red;
+.config-card{
+	float: left;
 }
-.top-divider{
-    border-top: 3pt double #ff4d4d;
+
+.config-header{
+	text-align: center;
+}
+
+.config-values td:first-child{
+	text-align:  left;
+	font-weight: bold;
+}
+.config-values td:last-child{
+	text-align:  center;
+}
+.null{
+    color:red;
 }
 </style>
-</head>
-<body>
-<h1>
-Overview of Deployments
-</h1>
-<table>");
+<body>");
+
+                foreach (var companySetting in companySettings)
+                    writer.WriteLine(GetTableMarkUp(companySetting, masterKeys));
+
+                writer.WriteLine(@"</body>
+</html>");
 
                 Process.Start(reportName);
             }
+        }
+
+        private static string GetTableMarkUp(CompanySettingInfo companySetting, IEnumerable<string> masterKeys)
+        {
+            var html = $@"<table class='config-card'>
+<tbody class='config-header'>
+	<tr>
+		<td colspan='2'>
+			<b>Server: </b>{companySetting.Server}<br/>
+			<b>Database: </b>{companySetting.Database}<br/> 
+			<b>Table: </b>{companySetting.Table}
+		</td>
+	</tr>
+</tbody>
+<tr><td colspan='2'><hr></td></tr>
+<tbody class='config-values'>";
+
+            foreach (var key in masterKeys)
+                html += $@"	<tr><td>{key}</td><td>{(companySetting.Settings[key] ?? "<span class='null'>(Not Found)</span>")}</td></tr>";
+
+            html += @"</tbody>
+</table>";
+
+            return html;
         }
 
         private static IEnumerable<CompanySettingInfo> GetCompanySettingsFromDatabase(string connectionName)

@@ -11,7 +11,7 @@ namespace DeploymentChecker
     {
         static void Main(string[] args)
         {
-            DeploymentReport.Run();
+            CompanySettingsReport.Run();
 
         }
     }   
