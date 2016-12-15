@@ -10,8 +10,6 @@ public class BuildInfo
     public string BuildVersion { get; set; }
     public string Server { get; set; }
     public string Database { get; set; }
-//    public string UserId { get; set; }
-//    public string Password { get; set; }
     public string IdentityServer { get; set; }
     public string CreatedTime { get; set; }
     public bool HasError { get; set; } = false;
@@ -29,8 +27,6 @@ public class BuildInfo
 
             Server = sqlConnString.DataSource;
             Database = sqlConnString.InitialCatalog;
-//            UserId = sqlConnString.UserID;
-//            Password = sqlConnString.Password;
         }
         catch
         {
