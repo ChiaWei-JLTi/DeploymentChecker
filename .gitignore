@@ -1,0 +1,5 @@
+DeploymentChecker.sln
+DeploymentChecker/bin/*
+DeploymentChecker/obj/*
+DeploymentChecker/Properties/*
+.vs
