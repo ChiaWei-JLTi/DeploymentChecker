@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-public static class Report
+public static class DeploymentReport
 {
     public static void Run()
     {

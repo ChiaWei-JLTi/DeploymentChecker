@@ -24,27 +24,28 @@ public class Program
 
 
 
-//        var connString = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
-//        using (var conn = new SqlConnection(connString))
-//        {
-//            const string sql = "SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS Name FROM information_schema.tables WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME = 'CompanySettings'";
-//            var cmd = new SqlCommand(sql, conn);
-//            conn.Open();
-//
-//            var reader = cmd.ExecuteReader();
-//            while (reader.Read())
-//            {
-//                Console.WriteLine(reader["Name"]);
-//            }
-//
-//        }
+        var connString = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
+        var companySettingTables = new List<string>();
+        using (var conn = new SqlConnection(connString))
+        {
+            const string sqlGetTables = "SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS Name FROM information_schema.tables WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME = 'CompanySettings'";
+            conn.Open();
+            
+            
+            var cmd = new SqlCommand(sqlGetTables, conn);
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                companySettingTables.Add(reader["Name"].ToString());
+            }
+        }
 
-        var c = new CompanySettingInfo();
-        c.AddOrUpdate("ShowBalance", "true");
-        c.AddOrUpdate("ShowBenefits", "false");
-        c.AddOrUpdate("ShowBenefits", "true");
-        var keys = new List<string>() {"NationalService", "ShowPrice", "ShowBalance", "HongKong"};
-        c.Sync(keys);
+//        var c = new CompanySettingInfo();
+//        c.AddOrUpdate("ShowBalance", "true");
+//        c.AddOrUpdate("ShowBenefits", "false");
+//        c.AddOrUpdate("ShowBenefits", "true");
+//        var keys = new List<string>() {"NationalService", "ShowPrice", "ShowBalance", "HongKong"};
+//        c.Sync(keys);
 
 
 

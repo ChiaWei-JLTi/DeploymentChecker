@@ -28,6 +28,25 @@ public class CompanySettingInfo
     {
         Sync(settings.Keys);
     }
+
+    public static void Sync(IEnumerable<CompanySettingInfo> collection)
+    {
+        var masterKeys = new List<string>();
+
+        foreach (var companySettingInfo in collection)
+        {
+            foreach (var key in companySettingInfo.Settings.Keys)
+            {
+                if(!masterKeys.Contains(key))
+                    masterKeys.Add(key);
+            }
+        }
+
+        foreach (var companySettingInfo in collection)
+        {
+            companySettingInfo.Sync(masterKeys);
+        }
+    }
 }
 
 

@@ -44,11 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompanySettingInfo.cs" />
-    <Compile Include="BuildInfo.cs" />
+    <Compile Include="Controllers\CompanySettingsReport.cs" />
+    <Compile Include="Models\CompanySettingInfo.cs" />
+    <Compile Include="Models\BuildInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Report.cs" />
+    <Compile Include="Controllers\DeploymentReport.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
