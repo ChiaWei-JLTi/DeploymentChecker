@@ -6,11 +6,11 @@ using System.IO;
 using System.Linq;
 using DeploymentChecker.Models;
 
-namespace DeploymentChecker.Controllers
+namespace DeploymentChecker.Reports
 {
-    public static class DeploymentReport
+    public class DeploymentReport: IReport
     {
-        public static void Run()
+        public void Run()
         {
             var projectsFolder = ConfigurationManager.AppSettings["ProjectsFolder"];
             var projectName = ConfigurationManager.AppSettings["ProjectName"];

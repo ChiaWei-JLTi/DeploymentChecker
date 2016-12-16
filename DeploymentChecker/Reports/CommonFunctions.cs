@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace DeploymentChecker.Controllers
+namespace DeploymentChecker.Reports
 {
     public enum ReportType
     {
@@ -17,7 +17,11 @@ namespace DeploymentChecker.Controllers
             if (!Directory.Exists(reportFolder))
                 Directory.CreateDirectory(reportFolder);
 
-            return Path.Combine(reportFolder, $"{type.ToString()}_{DateTime.Now:yyyyMMdd_HHmmss}.html");
+            var reportSubFolder = Path.Combine(reportFolder, type.ToString());
+            if (!Directory.Exists(reportSubFolder))
+                Directory.CreateDirectory(reportSubFolder);
+
+            return Path.Combine(reportSubFolder, $"{type.ToString()}_{DateTime.Now:yyyyMMdd_HHmmss}.html");
         } 
     }
 }

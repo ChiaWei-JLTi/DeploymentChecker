@@ -7,14 +7,14 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using DeploymentChecker.Controllers;
 using DeploymentChecker.Models;
+using DeploymentChecker.Reports;
 
-namespace DeploymentChecker.Controllers
+namespace DeploymentChecker.Reports
 {
-    public static class CompanySettingsReport
+    public class CompanySettingsReport: IReport
     {
-        public static void Run()
+        public void Run()
         {
             var companySettings = new List<CompanySettingInfo>();
 
@@ -26,10 +26,11 @@ namespace DeploymentChecker.Controllers
             }
 
             var masterKeys = CompanySettingInfo.Sync(companySettings);
+            masterKeys.Sort();
             Generate(companySettings, masterKeys);
         }
 
-        private static void Generate(IEnumerable<CompanySettingInfo> companySettings, IEnumerable<string> masterKeys)
+        private void Generate(IEnumerable<CompanySettingInfo> companySettings, IEnumerable<string> masterKeys)
         {
             var reportName = CommonFunctions.GetFileName(ReportType.CompanySettingsReport);
             using (var writer = File.CreateText(reportName))
@@ -58,29 +59,20 @@ th {
     background-color: #4CAF50;
     color: white;
 }
-.config-card{
-	float: left;
-}
-
-.config-header{
-	text-align: center;
-}
-
-.config-values td:first-child{
-	text-align:  left;
-	font-weight: bold;
-}
-.config-values td:last-child{
-	text-align:  center;
-}
 .null{
     color:red;
+}
+.container{
+	width: auto;
+	overflow: hidden;
 }
 </style>
 <body>");
 
-                foreach (var companySetting in companySettings)
-                    writer.WriteLine(GetTableMarkUp(companySetting, masterKeys));
+//                foreach (var companySetting in companySettings)
+//                    writer.WriteLine(GetTableMarkUp(companySetting, masterKeys));
+
+                writer.WriteLine(GetTableMarkUp(companySettings, masterKeys));
 
                 writer.WriteLine(@"</body>
 </html>");
@@ -89,31 +81,36 @@ th {
             }
         }
 
-        private static string GetTableMarkUp(CompanySettingInfo companySetting, IEnumerable<string> masterKeys)
+        private string GetTableMarkUp(IEnumerable<CompanySettingInfo> companySetting, IEnumerable<string> masterKeys)
         {
-            var html = $@"<table class='config-card'>
-<tbody class='config-header'>
-	<tr>
-		<td colspan='2'>
-			<b>Server: </b>{companySetting.Server}<br/>
-			<b>Database: </b>{companySetting.Database}<br/> 
-			<b>Table: </b>{companySetting.Table}
-		</td>
-	</tr>
-</tbody>
-<tr><td colspan='2'><hr></td></tr>
-<tbody class='config-values'>";
-
-            foreach (var key in masterKeys)
-                html += $@"	<tr><td>{key}</td><td>{(companySetting.Settings[key] ?? "<span class='null'>(Not Found)</span>")}</td></tr>";
-
-            html += @"</tbody>
-</table>";
-
-            return html;
+            return "";
         }
 
-        private static IEnumerable<CompanySettingInfo> GetCompanySettingsFromDatabase(string connectionName)
+//        private static string GetTableMarkUp(CompanySettingInfo companySetting, IEnumerable<string> masterKeys)
+//        {
+//            var html = $@"<table class='config-card'>
+//<tbody class='config-header'>
+//	<tr>
+//		<td colspan='2'>
+//			<b>Server: </b>{companySetting.Server}<br/>
+//			<b>Database: </b>{companySetting.Database}<br/> 
+//			<b>Table: </b>{companySetting.Table}
+//		</td>
+//	</tr>
+//</tbody>
+//<tr><td colspan='2'><hr></td></tr>
+//<tbody class='config-values'>";
+//
+//            foreach (var key in masterKeys)
+//                html += $@"	<tr><td>{key}</td><td>{(companySetting.Settings[key] ?? "<span class='null'>(Not Found)</span>")}</td></tr>";
+//
+//            html += @"</tbody>
+//</table>";
+//
+//            return html;
+//        }
+
+        private IEnumerable<CompanySettingInfo> GetCompanySettingsFromDatabase(string connectionName)
         {
             var companySettingInfos = new List<CompanySettingInfo>();
 
@@ -154,7 +151,7 @@ th {
             return companySettingInfos;
         }
 
-        private static IEnumerable<string> GetCompanySettingTables(string connectionName)
+        private IEnumerable<string> GetCompanySettingTables(string connectionName)
         {
             var companySettingTables = new List<string>();
 
@@ -183,7 +180,7 @@ th {
             return companySettingTables;
         }
 
-        private static string GetConnectionString(string connectionName)
+        private string GetConnectionString(string connectionName)
         {
             return ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
         }

@@ -44,13 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\CommonFunctions.cs" />
-    <Compile Include="Controllers\CompanySettingsReport.cs" />
+    <Compile Include="Reports\CommonFunctions.cs" />
+    <Compile Include="Reports\CompanySettingsReport.cs" />
     <Compile Include="Models\CompanySettingInfo.cs" />
     <Compile Include="Models\BuildInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\DeploymentReport.cs" />
+    <Compile Include="Reports\DeploymentReport.cs" />
+    <Compile Include="Reports\IReport.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
