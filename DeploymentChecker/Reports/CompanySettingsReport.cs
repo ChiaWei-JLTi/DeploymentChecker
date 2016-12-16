@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Data.SqlTypes;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using DeploymentChecker.Models;
-using DeploymentChecker.Reports;
 
 namespace DeploymentChecker.Reports
 {
@@ -46,6 +41,7 @@ table {
     margin: 20px;
     max-width: 100%;
     white-space:nowrap;
+    font-size: 90%;
 }
 th, td {
     text-align: center;
@@ -54,26 +50,25 @@ th, td {
     padding-bottom: 5px;
     padding-left: 15px;
 }
-tr:nth-child(even){background-color: #f2f2f2}
+td:first-child{
+    text-align: left;
+}
+tr:nth-child(even){
+    background-color: #f2f2f2
+}
 th {
     background-color: #4CAF50;
     color: white;
+    font-weight: normal;
 }
-.null{
+.null-value{
     color:red;
 }
-.container{
-	width: auto;
-	overflow: hidden;
-}
 </style>
-<body>");
-
-//                foreach (var companySetting in companySettings)
-//                    writer.WriteLine(GetTableMarkUp(companySetting, masterKeys));
+<body>
+<h1>Overview of Company Settings</h1>");
 
                 writer.WriteLine(GetTableMarkUp(companySettings, masterKeys));
-
                 writer.WriteLine(@"</body>
 </html>");
 
@@ -81,34 +76,34 @@ th {
             }
         }
 
-        private string GetTableMarkUp(IEnumerable<CompanySettingInfo> companySetting, IEnumerable<string> masterKeys)
+        private string GetTableMarkUp(IEnumerable<CompanySettingInfo> companySettings, IEnumerable<string> masterKeys)
         {
-            return "";
-        }
+            var html = "<table><tr>\n";
 
-//        private static string GetTableMarkUp(CompanySettingInfo companySetting, IEnumerable<string> masterKeys)
-//        {
-//            var html = $@"<table class='config-card'>
-//<tbody class='config-header'>
-//	<tr>
-//		<td colspan='2'>
-//			<b>Server: </b>{companySetting.Server}<br/>
-//			<b>Database: </b>{companySetting.Database}<br/> 
-//			<b>Table: </b>{companySetting.Table}
-//		</td>
-//	</tr>
-//</tbody>
-//<tr><td colspan='2'><hr></td></tr>
-//<tbody class='config-values'>";
-//
-//            foreach (var key in masterKeys)
-//                html += $@"	<tr><td>{key}</td><td>{(companySetting.Settings[key] ?? "<span class='null'>(Not Found)</span>")}</td></tr>";
-//
-//            html += @"</tbody>
-//</table>";
-//
-//            return html;
-//        }
+            html += "<tr>\n";
+            html += "<th><b>Key</b></th>\n";
+            foreach (var setting in companySettings)
+                html += $"<th><b>Server: </b>{setting.Server}<br><b>Database: </b>{setting.Database}<br><b>Table: </b>{setting.Table}</th>\n";
+            html += "</tr>\n";
+
+            foreach (var key in masterKeys)
+            {
+                html += "<tr>\n";
+                html += $"<td>{key}</td>\n";
+                foreach (var setting in companySettings)
+                {
+                    var value = setting.Settings[key];
+                    if(value == null)
+                        html += $"<td class='null-value'>(Not Found)</td>\n";
+                    else
+                        html += $"<td>{value}</td>\n";
+                }
+                html += "</tr>\n";
+            }
+
+            html += "</tr></table>";
+            return html;
+        }
 
         private IEnumerable<CompanySettingInfo> GetCompanySettingsFromDatabase(string connectionName)
         {
