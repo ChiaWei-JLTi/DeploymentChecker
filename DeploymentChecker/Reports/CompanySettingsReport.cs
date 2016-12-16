@@ -119,7 +119,7 @@ th {
 
                     foreach (var table in GetCompanySettingTables(connectionName))
                     {
-                        var sql = $"SELECT [Key], [Value] FROM {table}";
+                        var sql = $"SELECT LTRIM(RTRIM(REPLACE(REPLACE(REPLACE([Key], CHAR(9), ''), CHAR(10), ''), CHAR(13), ''))) AS [Key], [Value] FROM {table}";
                         var cmd = new SqlCommand(sql, conn);
 
                         var companySettingInfo = new CompanySettingInfo()
@@ -140,7 +140,6 @@ th {
             catch
             {
                 return new List<CompanySettingInfo>();
-                ;
             }
 
             return companySettingInfos;
@@ -169,7 +168,6 @@ th {
             catch
             {
                 return new List<string>();
-                ;
             }
 
             return companySettingTables;
